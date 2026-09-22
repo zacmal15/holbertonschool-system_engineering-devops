@@ -1,0 +1,74 @@
+                              USER
+                        ┌─────────────┐
+                        │   Browser   │
+                        └──────┬──────┘
+                               │
+                               │ www.foobar.com
+                               │ HTTP over TCP/IP
+                               ▼
+                        ┌─────────────┐
+                        │     DNS     │
+                        └──────┬──────┘
+                               │
+                               │ A record
+                               │
+                               │ www.foobar.com
+                               │      ↓
+                               │   8.8.8.8
+                               ▼
+
+             ┌─────────────────────────────────────┐
+             │        SERVER — 8.8.8.8             │
+             │                                     │
+             │        ┌──────────────┐             │
+             │        │    Nginx     │             │
+             │        │  Web Server  │             │
+             │        └──────┬───────┘             │
+             │               │                     │
+             │               ▼                     │
+             │        ┌──────────────┐             │
+             │        │ Application  │             │
+             │        │    Server    │             │
+             │        └──────┬───────┘             │
+             │               │                     │
+             │               ▼                     │
+             │        ┌──────────────┐             │
+             │        │ Application  │             │
+             │        │ Files / Code │             │
+             │        └──────┬───────┘             │
+             │               │                     │
+             │               ▼                     │
+             │        ┌──────────────┐             │
+             │        │    MySQL     │             │
+             │        │   Database   │             │
+             │        └──────────────┘             │
+             │                                     │
+             └─────────────────────────────────────┘
+
+Explanation:
+
+1. User requests website by opening a web browser and enetering www.foobar.com
+
+2. The domain name is foobar.com, its purpose is to provide a human-readable name for the website instead of making users rememeber IP addresses of the server
+
+3. wwww is configured as an A record pointing to 8.8.8.8, which maps a hostname to an IPv4 address
+
+4. The server at 8.8.8.8 is a computer that provides services and resources to other computers over a network. This server contains nginx, app server, app files, MySQL
+
+5. Nginx/web server receives the HTTP requests from clients and can return static files such as HTML/CSS, otherwise this will pass the request to the app server if it requires application logic.
+
+6. The app server is responsible for running the application's backend code, runs when dynamic processing is required from the web server.
+
+7. Application files are the actual code of the website, which can include python files, api endpoints, flask routes, etc.
+
+8. MySQL Database stores the application's persistent data. The application communicates with MySQL when it needs to retrieve, create, modify or delete stored info. (CRUM)
+
+9. The server communicates with the user's computer by using HTTP over TCP/IP.
+
+Issues with the Infrastructure:
+
+1. SPOF, aka single point of failure refers to when everything is located on one server, which the main probl;em is if that one server goes down, there is no backup server to take over and clients are not able to access any servers.
+
+2. Maintenance causes downtime, since there is only one server, there is no other server that can process requests in the downtime while the maintenance is happening.
+
+3. One server cannot handle unlimited traffic as the server will have limited CPU power, RAM, disk resources, etc.
