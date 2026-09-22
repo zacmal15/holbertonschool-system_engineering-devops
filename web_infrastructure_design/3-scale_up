@@ -1,0 +1,61 @@
+                              USER
+                               │
+                        www.foobar.com
+                               │
+                              DNS
+                               │
+                               ▼
+                 ┌─────────────────────────┐
+                 │  LOAD BALANCER CLUSTER  │
+                 │                         │
+                 │ HAProxy 1    HAProxy 2  │
+                 │  Active       Passive   │
+                 └────────────┬────────────┘
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │    WEB SERVER    │
+                    │                  │
+                    │      Nginx       │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ APPLICATION      │
+                    │ SERVER           │
+                    │                  │
+                    │ App Server       │
+                    │ App Files        │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ DATABASE SERVER  │
+                    │                  │
+                    │ MySQL Primary    │
+                    └────────┬─────────┘
+                             │
+                         Replication
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ DATABASE SERVER  │
+                    │                  │
+                    │ MySQL Replica    │
+                    └──────────────────┘
+
+Explanation:
+
+1. Added another server to distribute infrastructure components across separate machines, reducing resource competition.
+
+2. Added a second HAProxy to provide load-balancer redundancy, that way if one HAProxy failed then the other can continue handling traffic, also removing a single load balancer as a SPOF.
+
+3. We configure the HAProxy servers as a cluster to that the two load balancers work together to provide high availability,
+
+4. We separate the web servers so that the server that hand;es the http/s requests can independently scale, rather than also scaling the application or database unintentionally.
+
+5. We separate the application server so that it runs the app code and business logic independently from the web server and database.
+
+6. We separate the database server so that MySQL can use dedicated CPU, RAM, storage and disk I/O without competing with nginx or the app server.
+
+7. We split the web server, app server and database so that it separates responsibilities, reduces resource competition, makes maintenance easier, isolates failures, and allows each part of the infrastructure to be scaled independently.
