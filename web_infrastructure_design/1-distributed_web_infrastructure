@@ -1,0 +1,68 @@
+                              USER
+                         ┌───────────┐
+                         │  Browser  │
+                         └─────┬─────┘
+                               │
+                         www.foobar.com
+                               │
+                               ▼
+                         ┌───────────┐
+                         │    DNS    │
+                         └─────┬─────┘
+                               │
+                               │ A record
+                               ▼
+                    ┌─────────────────────┐
+                    │      SERVER 1       │
+                    │                     │
+                    │       HAProxy       │
+                    │    Load Balancer    │
+                    │                     │
+                    └──────┬───────┬──────┘
+                           │       │
+                    HTTP   │       │   HTTP
+                           │       │
+              ┌────────────┘       └────────────┐
+              ▼                                 ▼
+
+    ┌─────────────────────────┐      ┌─────────────────────────┐
+    │        SERVER 2         │      │        SERVER 3         │
+    │                         │      │                         │
+    │        Nginx            │      │        Nginx            │
+    │     Web Server          │      │     Web Server          │
+    │          │              │      │          │              │
+    │          ▼              │      │          ▼              │
+    │   Application Server    │      │   Application Server    │
+    │          │              │      │          │              │
+    │          ▼              │      │          ▼              │
+    │   Application Files     │      │   Application Files     │
+    │          │              │      │          │              │
+    │          ▼              │      │          ▼              │
+    │   ┌──────────────┐      │      │   ┌──────────────┐      │
+    │   │    MySQL     │      │      │   │    MySQL     │      │
+    │   │   PRIMARY    │──────┼─────►│   │   REPLICA    │      │
+    │   └──────────────┘      │      │   └──────────────┘      │
+    │                         │      │                         │
+    └─────────────────────────┘      └─────────────────────────┘
+
+                   Database Replication ───────►
+
+Explanation:
+
+1. We added a HAProxy to distribute incoing traffic between two web servers and to improve availability and scalability
+
+2. We added another server to provide redundancy and allow traffic t be shared between multiple servers
+
+3. The distribution algorithm is round robin, where the HAProxy sends requests to each server in sequence.
+
+4. We chose to do active-active as both servers are actively handling requests.
+
+5. Primary-replica worksby making changes to the MySQL primary database and these changes are replicated so the replica maintains a copy of the data
+
+6. The primary handles, while the database writes. The replica receives replicated changes and can hande reads when the application is configured to use it.
+
+7. The single HAProxy is a SPOF, as well as the MySQL database.
+
+8. The security issue is there are no firewalls, and the website uses http rather than https, so traffic is not protected with TLS encryption.
+
+9. There is also no monitoring system to track server health, resource usage, errors, availability and performance.
